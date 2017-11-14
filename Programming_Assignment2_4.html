@@ -1,0 +1,101 @@
+<html>
+<head>
+  <style>
+  /*depth입력창과 버튼 위치 설정*/
+  #myDIV{
+    top : 15px;
+    left : 15px;
+  }
+  </style>
+ </head>
+<body>
+
+<div id = "myDIV" >
+  Depth : <input type = "number" id = "num">
+  <button onclick="output_fractal()">Execute</button>
+  <button onclick="RESET()">RESET</button>
+</div>
+
+<canvas id="canvas" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+function output_fractal()
+{
+	function getRandomColor() 
+	{
+	  var letters = '0123456789ABCDEF';
+	  var color = '#';
+	  for (var i = 0; i < 6; i++) 
+	  {
+	    color += letters[Math.floor(Math.random() * 16)];
+	  }
+  	  return color;
+  	}
+	var elem = document.getElementById('canvas');
+	var context = elem.getContext('2d');
+	// context.fillStyle = "black";
+	// context.fillRect(0,0,canvas.width, canvas.height);
+	var grd=context.createRadialGradient(300,300,5,300,300,300);
+	grd.addColorStop(0, getRandomColor());
+	grd.addColorStop(1, "black");
+
+	// Fill with gradient
+	context.fillStyle=grd;
+	context.fillRect(0,0, canvas.width, canvas.height);
+	var canv_width = 600;
+	var canv_height = 600;
+	var factor = 7;
+	var cnt = 0, blur = 10;
+	var horizontal = Math.pow(factor/2, 2); //Horizontal increase
+	var idx = 0;
+
+	context.lineWidth = 0.5;
+	
+	var deg_to_rad = Math.PI / 180.0;
+	var depth = document.getElementById("num").value;
+
+	function drawRect(x1, y1, width, height, angle)
+	{
+		context.save();//Save the unrotated context
+
+		context.translate(x1 + width/2, y1 + height/2); //move the rotation axis to the center of the given rect
+
+		context.rotate(angle * Math.PI/180); //rotate the rect by given angle
+
+		context.beginPath();
+		//-width/2 and -height/2 are offsets to draw the rotated rectangle
+
+		context.rect(-width/2, -height/2, width,height); //Draw the rect on the rotated context
+		context.strokeStyle = 'white';//getRandomColor();
+		context.stroke();
+		context.closePath();
+		context.restore(); //restore the context to unrotated state
+
+		cnt++;
+	}
+
+	function drawFractal(x1, y1, size, angle, depth){
+		if(depth !== 0)
+		{
+			var x2 = x1 - Math.sqrt(horizontal); 
+			var y2 = y1 - Math.sqrt(horizontal); 
+			drawRect(x1, y1, size, size, angle);
+			if(depth % 18 < 9)
+				drawFractal(x2, y2, size+7, angle-1, depth-1);
+			else
+				drawFractal(x2, y2, size+7, angle+1, depth-1);
+		}
+	}
+	drawFractal(canv_width/2, canv_height/2, factor, 0, depth);
+}
+//function to reset
+function RESET(){
+  var cnvs = document.getElementById('canvas');
+  var cnxt = cnvs.getContext('2d');
+  cnxt.clearRect(0, 0, cnvs.width, cnvs.height);
+}
+
+</script>
+
+</body>
+</html>
